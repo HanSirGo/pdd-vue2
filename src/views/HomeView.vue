@@ -1,12 +1,13 @@
 <template>
   <div class="home">
     <Search :mess="mess" />
-    <van-tabs sticky offset-top="53px">
+    <van-tabs>
       <van-tab v-for="(item, index) in nav" :title="item.title" :key="index">
-        内容 {{ index }}
-        <div style="height:100vh;background-color:blue"></div>
+        <template>
+          <div>1111111111111111</div>
+        </template>
       </van-tab>
-    </van-tabs>    
+    </van-tabs>
     <TabBar />
   </div>
 </template>
@@ -52,24 +53,41 @@ export default {
     };
   },
   methods: {
-    tabqihuan(a,b){
-      console.log(a,b);
-    }
+    tabqihuan(a, b) {
+      console.log(a, b);
+    },
   },
 };
 </script>
 <style lang="less" scoped>
 .home {
-  /deep/ .van-tab{
-    font-size:14px;
-    color:#444;
-    &.van-tab--active{
-    color:#f00;
-    .van-tab__text{
-      font-weight: 900;
+  height: 100vh;
+  /deep/ .van-tabs{
+    height: calc( 100vh - 104px );
+    .van-tabs__wrap{
+      border-bottom:1px solid #ccc;
+      .van-tab{
+        &.van-tab--active{
+          .van-tab__text{
+            font-weight: 900;
+            color:#f00;
+          }
+        }
+      }
+    }
+    .van-tabs__content {
+      // background-color:blue;
+      height:calc(100% - 43px);
+      overflow: scroll;
+      &::-webkit-scrollbar{
+        display:none;
+      }
+      .van-tab__pane{
+        // padding-top:10px;
+        // height:800px;
+        // background-color:pink;
+      }
     }
   }
-  }
-  
 }
 </style>

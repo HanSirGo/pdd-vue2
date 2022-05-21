@@ -1,6 +1,6 @@
 <template>
   <div class="search">
-    <van-sticky>
+    <!-- <van-sticky> -->
     <van-search
       class="s"
       shape
@@ -9,7 +9,7 @@
       input-align="left"
     />
     <!-- <span class="s-icon"><van-icon name="search" size="20"/></span> -->
-    </van-sticky>
+    <!-- </van-sticky> -->
   </div>
 </template>
 <script>
