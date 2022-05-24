@@ -47,7 +47,7 @@ const routes = [
       if(token){
         next()
       }else{
-          next({path:'/login',query:{name:'talk'}})
+          next({path:'/login',query:{name:'mine'}})
       }
     }
   },

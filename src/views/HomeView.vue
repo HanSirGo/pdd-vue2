@@ -1,26 +1,105 @@
 <template>
   <div class="home">
     <Search :mess="mess" />
-    <van-tabs>
+    <van-tabs @click="onClick">
       <van-tab v-for="(item, index) in nav" :title="item.title" :key="index">
-        <template>
+        <div class="content">
+          <!-- 推荐 -->
           <div v-if="index == 0">
+            <!-- 分类 -->
             <div class="tui-top">
               <van-grid square :border="false" column-num="6">
                 <van-grid-item
-                  v-for="value in item.types"
+                  v-for="value in alltypes"
                   :key="value.id"
                   :icon="value.img"
                   :text="value.title"
                 />
               </van-grid>
             </div>
-            <p>222</p>
+            <div class="products">
+              <div class="pro-left">
+                <ShowProduct :products="products.filter((item,index)=>index%2==0)"/>
+              </div>
+              <div class="pro-right">
+                <ShowProduct :products="products.filter((item,index)=>index%2!=0)"/>
+              </div>
+            </div>
           </div>
+          <!-- 其他的 -->
           <div v-else>
-            <h3>111111111</h3>
+            <!-- 分类 -->
+            <div class="grid">
+              <van-grid :column-num="5" :border="false">
+                <!-- length == 9 有 展开全部 按钮-->
+                <template v-if="alltypes.length == 9">
+                  <van-grid-item
+                    v-for="(item, index) in alltypes"
+                    :key="index"
+                    :icon="item.img"
+                    :text="item.title"
+                  />
+                  <van-grid-item
+                    icon="add-o"
+                    text="展开全部"
+                    @click="openall"
+                  />
+                </template>
+                <!-- length == 10 无 展开全部 按钮-->
+                <template v-else-if="alltypes.length == 10">
+                  <van-grid-item
+                    v-for="(item, index) in alltypes"
+                    :key="index"
+                    :icon="item.img"
+                    :text="item.title"
+                  />
+                </template>
+                <!-- length > 10 收起 按钮-->
+                <template v-else>
+                  <van-grid-item
+                    v-for="(item, index) in alltypes"
+                    :key="index"
+                    :icon="item.img"
+                    :text="item.title"
+                  />
+                  <van-grid-item icon="close" text="收起" @click="closesome" />
+                </template>
+              </van-grid>
+            </div>
+            <!-- 排行 -->
+            <div class="paihang">
+              <van-grid direction="horizontal" :column-num="2" :border="false">
+                <van-grid-item v-for="(item, index) in paihang" :key="index">
+                  <template #default>
+                    <div class="text">
+                      <div class="title">
+                        <img v-if="index == 0" :src="item.title_icon" alt="" />
+                        <span>{{ item.title }}</span>
+                      </div>
+                      <div class="text_n">{{ item.text }}</div>
+                    </div>
+                    <div
+                      class="img"
+                      v-for="(el, index) in item.imgs"
+                      :key="index"
+                    >
+                      <img :src="el" alt="" />
+                    </div>
+                  </template>
+                </van-grid-item>
+              </van-grid>
+            </div>
+            <!-- 商品 -->
+            <div class="products">
+              <div class="pro-left">
+                <ShowProduct :products="products.filter((item,index)=>index%2==0)"/>
+              </div>
+              <div class="pro-right">
+                <ShowProduct :products="products.filter((item,index)=>index%2!=0)"/>
+              </div>
+            </div>
           </div>
-        </template>
+        </div>
       </van-tab>
     </van-tabs>
     <TabBar />
@@ -32,110 +111,58 @@
 import instance from "@/api/api";
 import TabBar from "@/components/TabBar.vue";
 import Search from "@/components/Search.vue";
+import ShowProduct from '@/components/ShowProduct.vue'
 export default {
   name: "HomeView",
   components: {
     TabBar,
     Search,
+    ShowProduct
   },
   data() {
     return {
       mess: "首页搜索",
-      nav: [
-        {
-          title: "推荐",
-          types: [
-            {
-              id: "t0",
-              title: "限时秒杀",
-              img: "https://commimg.pddpic.com/oms_img_ng/2022-05-20/6a5f0152-858f-4871-b0b4-06a80092dd08.gif?imageView2/2/w/117/q/80/format/webp",
-            },
-            {
-              id: "t1",
-              title: "断码清仓",
-              img: "https://commimg.pddpic.com/oms_img_ng/2022-05-19/4b64083d-637f-41c9-af43-c4753556cec6.png?imageView2/2/w/117/q/80/format/webp",
-            },
-            {
-              id: "t2",
-              title: "发现好货",
-              img: "https://img.pddpic.com/goods/2020-04-19/ecdc795c12e256a869a883f247ccdc5d.png?imageView2/2/w/117/q/80/format/webp",
-            },
-            {
-              id: "t3",
-              title: "多多果园",
-              img: "https://img.pddpic.com/goods/2020-01-14/b39df4af9b17ba0d063c04da0aea85aa.png?imageView2/2/w/117/q/80/format/webp",
-            },
-            {
-              id: "t4",
-              title: "9块9特卖",
-              img: "https://img.pddpic.com/goods/2020-01-14/8ed387bd5d07f45ce6fee30a0ab80e80.png?imageView2/2/w/117/q/80/format/webp",
-            },
-            {
-              id: "t5",
-              title: "多多爱消除",
-              img: "https://img.pddpic.com/goods/2020-01-14/37fe68d866cb25a887beeb74699196b9.png?imageView2/2/w/117/q/80/format/webp",
-            },
-            {
-              id: "t6",
-              title: "充值中心",
-              img: "https://img.pddpic.com/goods/2020-01-14/0fab520471880b5728fb7150d77f5390.png?imageView2/2/w/117/q/80/format/webp",
-            },
-            {
-              id: "t7",
-              title: "医药馆",
-              img: "https://img.pddpic.com/goods/2020-02-26/f9e3069d2e461cd5f5eb7d77ffce9d9d.png?imageView2/2/w/117/q/80/format/webp",
-            },
-            {
-              id: "t8",
-              title: "签到",
-              img: "https://img.pddpic.com/goods/2020-02-24/1ac41ebf88457e29ac4f8b5a01e72f1d.png?imageView2/2/w/117/q/80/format/webp",
-            },
-            {
-              id: "t9",
-              title: "多多赚大钱",
-              img: "https://commimg.pddpic.com/oms_img_ng/2020-06-05/6709569b-84e6-4556-b82d-4c9f32840257.png?imageView2/2/w/117/q/80/format/webp",
-            },
-            {
-              id: "t10",
-              title: "行家帮你选",
-              img: "https://commimg.pddpic.com/oms_img_ng/2020-12-04/c1a20306-bdb3-42c5-b0bb-e4018ce9f4d6.png?imageView2/2/w/117/q/80/format/webp",
-            },
-            {
-              id: "t11",
-              title: "省钱月卡",
-              img: "https://img.pddpic.com/goods/2020-01-14/54ece7ca8c54cd8925d631323659e42f.png?imageView2/2/w/117/q/80/format/webp",
-            },
-          ],
-          products: [],
-        },
-        { title: "女装", types: [], products: [] },
-        { title: "鞋包", types: [], products: [] },
-        { title: "手机", types: [], products: [] },
-        { title: "食品", types: [], products: [] },
-        { title: "母婴", types: [], products: [] },
-        { title: "男装", types: [], products: [] },
-        { title: "百货", types: [], products: [] },
-        { title: "内衣", types: [], products: [] },
-        { title: "电器", types: [], products: [] },
-        { title: "家纺", types: [], products: [] },
-        { title: "水果", types: [], products: [] },
-        { title: "家具", types: [], products: [] },
-        { title: "美妆", types: [], products: [] },
-        { title: "家装", types: [], products: [] },
-        { title: "运动", types: [], products: [] },
-        { title: "车品", types: [], products: [] },
-        { title: "医药", types: [], products: [] },
-        { title: "电脑", types: [], products: [] },
-        { title: "海淘", types: [], products: [] },
-        { title: "饰品", types: [], products: [] },
-        { title: "玩乐", types: [], products: [] },
-      ],
+      nav:[],//tabs
+      tabindex: 0, //选中 tab 的索引
+      alltypes: [], //选中tab 的 分类
+      paihang: [], //排行
+      products: [], //商品
     };
   },
+  created() {
+    this.getdata()       
+  },
   methods: {
-    tabqihuan(a, b) {
-      console.log(a, b);
+    onClick(index, name) {
+      // console.log(index);
+      this.tabindex = index;
+      this.products = this.nav[index].products;
+      if (index != 0) {
+        this.paihang = this.nav[index].top;
+        if (this.nav[index].types.length > 10) {
+          this.alltypes = this.nav[index].types.slice(0, 9);
+        } else {
+          this.alltypes = this.nav[index].types;
+        }
+      } else {
+        this.alltypes = this.nav[index].types;
+      }
     },
+    openall() {
+      //展开全部
+      this.alltypes = this.nav[this.tabindex].types;
+    },
+    closesome() {
+      //收起
+      this.alltypes = this.nav[this.tabindex].types.slice(0, 9);
+    },
+    async getdata(){
+      let {data} = await instance.get('/getnav')
+      console.log(data);
+      this.nav = data
+      this.alltypes = this.nav[this.tabindex].types;
+      this.products = this.nav[this.tabindex].products; 
+    }
   },
 };
 </script>
@@ -169,7 +196,7 @@ export default {
         .tui-top {
           width: 100vw;
           overflow-x: scroll;
-          scrollbar-width:120px;
+          scrollbar-width: 120px;
           &::-webkit-scrollbar {
             // display:none;
             // width:120px;
@@ -186,15 +213,106 @@ export default {
           }
           .van-grid {
             width: 120%;
+            padding: 6px 0;
+            background-color: #fff;
             .van-grid-item {
               .van-grid-item__content {
-                padding-left: 0;
-                padding-right: 0;
+                padding: 0;
+                .van-grid-item__icon {
+                  width: 40px;
+                  height: 40px;
+                  .van-icon__image {
+                    width: 100%;
+                    height: 100%;
+                  }
+                }
               }
             }
           }
         }
       }
+    }
+    .grid {
+      .van-grid {
+        background-color: #fff;
+        padding: 6px 0;
+        .van-grid-item {
+          .van-grid-item__content {
+            padding: 0;
+            padding-top: 6px;
+            .van-grid-item__icon {
+              width: 56px;
+              height: 56px;
+              &.van-icon-add-o,
+              &.van-icon-close {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+              }
+              .van-icon__image {
+                width: 100%;
+                height: 100%;
+              }
+            }
+            .van-grid-item__text {
+              margin: 0;
+            }
+          }
+        }
+      }
+    }
+    .paihang {
+      margin: 8px 0;
+      .van-grid {
+        background: #fff;
+        padding: 12px 0;
+        .van-grid-item {
+          height: 36px;
+          &:first-child {
+            border-right: 0.5px solid #ddd;
+          }
+          .van-grid-item__content {
+            padding: 0 10px;
+            justify-content: space-around;
+            .text {
+              .title {
+                font-size: 14px;
+                color: #000;
+                img {
+                  width: 15px;
+                  height: 15px;
+                  margin-right: 5px;
+                }
+              }
+              .text_n {
+                color: #ddd;
+                font-size: 12px;
+                margin-top: 5px;
+              }
+            }
+            .img {
+              img {
+                width: 36px;
+                height: 36px;
+              }
+            }
+          }
+        }
+      }
+    }
+    .products {
+      display: flex;
+      justify-content: space-between; 
+      .pro-left{     
+        flex:1;
+        margin-right: 3px;
+      }
+      .pro-right{
+        flex:1;
+      }
+    }
+    .content {
+      background-color: #f4f4f4;
     }
   }
 }
